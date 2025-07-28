@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pets Data</title>
+</head>
+
+<body>
+
+  <header>
+    <h1>All Adoptable Pets Currently Available</h1>
+  </header>
+
+   <a href="/upload">Add a Pet</a><br><br>
+  
+    {{#pets}}      
+        Name: {{name}}<br>
+        Age: {{age}}<br>
+        Breed: {{breed}}<br>
+        <img src="{{image}}" width="100"><br><br>
+        <hr>
+    {{/pets}}
+
+    {{^pets}}
+      No pets available for adpotion.
+    {{/pets}}
+  
+</body>
+</html>
