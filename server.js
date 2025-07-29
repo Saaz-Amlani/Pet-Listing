@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
-const multer = require('multer');
+const AWS = require('aws-sdk');
+const multerS3 = require('multer-s3');
 const mustacheExpress = require('mustache-express');
 const app = express();
 
@@ -11,16 +12,23 @@ app.engine("mustache", mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-const upload = multer({ storage: storage });
 
+AWS.config.update({
+  region: 'us-east-2'
+});
+
+const s3_upload = new AWS.S3();
+
+const upload_images = multer({
+  storage: multerS3({
+    s3: s3_upload,
+    bucket: 'imagestorage-pet-listing',       // Replace with your actual bucket
+    acl: 'public-read',
+    key: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname);
+    }
+  })
+});
 
 if (!fs.existsSync('pets.json')) {
   fs.writeFileSync('pets.json', '[]');
@@ -37,14 +45,14 @@ app.get('/upload', function (req, res) {
   res.render('form');
 });
 
-app.post("/upload",upload.single('image'), function (req, res) {
+app.post("/upload",upload_images.single('image'), function (req, res) {
 
     const data = req.body;
 
     const name = data.name;
     const age = data.age;
     const breed = data.breed;
-    const image = '/uploads/' + req.file.filename;
+    const image = req.file.location;
 
     const pets = JSON.parse(fs.readFileSync('pets.json'));
      pets.push({ name, age, breed, image: image });
