@@ -24,7 +24,6 @@ const upload_images = multer({
   storage: multerS3({
     s3: s3_upload,
     bucket: 'imagestorage-pet-listing',
-    acl: 'public-read',
     key: function (req, file, cb) {
       cb(null, Date.now() + '-' + file.originalname);
     }
