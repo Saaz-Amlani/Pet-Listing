@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const AWS = require('aws-sdk');
+const multer = require ('multer');
 const multerS3 = require('multer-s3');
 const mustacheExpress = require('mustache-express');
 const app = express();
@@ -22,7 +23,7 @@ const s3_upload = new AWS.S3();
 const upload_images = multer({
   storage: multerS3({
     s3: s3_upload,
-    bucket: 'imagestorage-pet-listing',       // Replace with your actual bucket
+    bucket: 'imagestorage-pet-listing',
     acl: 'public-read',
     key: function (req, file, cb) {
       cb(null, Date.now() + '-' + file.originalname);
